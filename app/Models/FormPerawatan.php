@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class FormPerawatan extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'form_perawatan';
+
+    protected $fillable = [
+        'nomor_form',
+        'user_id',
+        'pengguna_id',
+        'asset_id',
+        'kondisi_akhir',
+        'kondisi_akhir_notes',
+        'notes',
+        'status',
+        'submitted_at',
+    ];
+
+    protected $casts = [
+        'submitted_at' => 'datetime',
+    ];
+
+    public function teknisi(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function pengguna(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'pengguna_id');
+    }
+
+    public function asset(): BelongsTo
+    {
+        return $this->belongsTo(Asset::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(FormPerawatanItem::class);
+    }
+
+    public function approvals(): MorphMany
+    {
+        return $this->morphMany(FormApproval::class, 'approvable');
+    }
+
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(FormAttachment::class, 'attachable');
+    }
+}
